@@ -1,113 +1,96 @@
-# 🚀 CareerPilot AI
+# CareerPilot AI — Skill-Gap Analysis and Interview Preparation
 
-**CareerPilot AI** is an intelligent, agentic career mapping and interview preparation assistant built with **LangGraph**, **LangServe**, **FastAPI**, and **Google Gemini**. 
+CareerPilot AI is an LLM-assisted career-planning prototype. It takes a target role, a user's current skills, and available time, then builds a skill-gap analysis, a learning roadmap, and role-specific interview questions.
 
-It accepts a user's natural-language career goals, explicit skills, and available timeframe, then dynamically generates a personalized skill-gap analysis, learning roadmap, and role-specific interview questions.
+The backend is implemented in Python with FastAPI and LangGraph. It uses a small role-knowledge collection with an in-memory vector store and Google Gemini for selected language and embedding steps.
 
----
+## Features
 
-## 🌟 Features
+- Parses career goals and available study time.
+- Retrieves role-related guidance from the included knowledge base.
+- Compares declared skills with role requirements.
+- Creates a prioritized roadmap based on missing skills and available time.
+- Generates role-specific interview questions.
+- Exposes the workflow and supported roles through REST endpoints.
+- Includes deterministic fallbacks for selected parsing/planning paths.
 
-- **🧠 Natural Language Understanding**: Parses unstructured user inputs (e.g., *"I want to become an AI Automation Engineer. I know Python and LangChain. I have 3 months."*) using a combination of LLM structured parsing and deterministic regex fallbacks.
-- **📚 Role-Specific Knowledge Base (RAG)**: Leverages an in-memory vector store to retrieve the exact requirements, frameworks, and prerequisites for various technical roles.
-- **⚡ Dynamic Skill Gap Analysis**: Automatically computes missing skills by comparing what the user explicitly knows against industry-standard role requirements.
-- **🗺️ Personalized Learning Roadmap**: Creates a prioritized, phase-by-phase learning sequence that respects the user's available timeline.
-- **🎯 Interview Preparation Engine**: Dynamically generates targeted technical, scenario-based, and project-based interview questions addressing the user's specific skill gaps.
-- **🛡️ High Reliability**: Built with comprehensive, deterministic fallbacks ensuring the agent never crashes or hallucinates if upstream LLM APIs (like Gemini) encounter outages or rate limits.
+## Architecture
 
----
+```mermaid
+flowchart TD
+    A[User goal and skill profile] --> B[Parse request]
+    B --> C[Retrieve role knowledge]
+    C --> D[Analyze skill gaps]
+    D --> E[Plan learning roadmap]
+    E --> F[Prepare interview questions]
+    F --> G[Structured response]
+```
 
-## 🛠️ Tech Stack
+## Technology
 
-- **Framework**: [FastAPI](https://fastapi.tiangolo.com/)
-- **AI Orchestration**: [LangGraph](https://python.langchain.com/docs/langgraph) & [LangChain](https://python.langchain.com/)
-- **API Deployment**: [LangServe](https://python.langchain.com/docs/langserve)
-- **LLM Engine**: Google Gemini (via `langchain-google-genai`)
-- **Vector Search**: `InMemoryVectorStore`
+- Python
+- FastAPI
+- LangGraph and LangChain
+- LangServe
+- Google Gemini (generation and embeddings)
+- In-memory vector store
 
----
-
-## 📂 Supported Roles
-
-CareerPilot natively understands and supports dynamic aliases for the following career tracks:
-- AI Automation Engineer
-- Agentic AI Engineer
-- Generative AI Engineer
-- Machine Learning Engineer
-- AI Scientist
-- Data Scientist
-- Backend Developer
-- Python Developer
-- Full Stack Developer
-
----
-
-## 🚀 Getting Started (Local Development)
+## Run locally
 
 ### Prerequisites
-- Python 3.9+
-- A Google Gemini API Key
 
-### Installation
+- Python 3.9 or newer
+- A Google Gemini API key
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/yourusername/careerpilot-ai.git
-   cd careerpilot-ai
-   ```
+### Install
 
-2. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
+```bash
+git clone https://github.com/vidwansai66/careerpilot-ai.git
+cd careerpilot-ai
+python -m venv .venv
+```
 
-3. **Set your environment variable:**
-   ```bash
-   # Windows (PowerShell)
-   $env:GEMINI_API_KEY="your_api_key_here"
-   
-   # Mac/Linux
-   export GEMINI_API_KEY="your_api_key_here"
-   ```
+Activate the environment, then install dependencies:
 
-4. **Run the server:**
-   ```bash
-   uvicorn app:app --reload
-   ```
+```bash
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
 
-5. **Test the agent:**
-   Open the LangServe Playground in your browser:
-   [http://localhost:8000/careerpilot/playground/](http://localhost:8000/careerpilot/playground/)
+# macOS / Linux
+source .venv/bin/activate
 
----
+pip install -r requirements.txt
+```
 
-## 📡 API Endpoints
+Set your key in the shell before starting the server:
 
-| Endpoint | Method | Description |
-|----------|--------|-------------|
-| `/` | GET | Basic health check and welcome message |
-| `/roles` | GET | Returns a JSON list of supported career roles |
-| `/architecture` | GET | Returns the JSON representation of the LangGraph state machine |
-| `/careerpilot/invoke` | POST | Submits a query to the agent via LangServe API |
-| `/careerpilot/playground/` | GET | Opens the interactive LangServe web UI |
+```bash
+# Windows PowerShell
+$env:GEMINI_API_KEY="your-gemini-api-key"
 
----
+# macOS / Linux
+export GEMINI_API_KEY="your-gemini-api-key"
+```
 
-## ☁️ Deployment (Vercel)
+Start the API:
 
-This project is specifically architected to be completely stateless and strictly bounded to `app.py` and `requirements.txt` to guarantee seamless serverless deployment on **Vercel**.
+```bash
+uvicorn app:app --reload
+```
 
-1. Install the Vercel CLI: `npm i -g vercel`
-2. Run `vercel` in the project root.
-3. Add your `GEMINI_API_KEY` to the Vercel project environment variables.
+Useful local routes:
 
----
+- [Web interface](http://127.0.0.1:8000/)
+- [Health check](http://127.0.0.1:8000/health)
+- [Supported roles](http://127.0.0.1:8000/roles)
+- [Architecture response](http://127.0.0.1:8000/architecture)
+- [Interactive LangServe playground](http://127.0.0.1:8000/careerpilot/playground/)
 
-## 🤝 Contributing
+OpenAPI docs are available at [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs).
 
-Contributions, issues, and feature requests are welcome! 
-Feel free to check [issues page](https://github.com/yourusername/careerpilot-ai/issues).
+## Configuration and limitations
 
-## 📝 License
-
-This project is [MIT](https://choosealicense.com/licenses/mit/) licensed.
+- The Gemini key is required for LLM/embedding operations; quota and provider availability can affect those steps.
+- Deterministic fallbacks cover selected logic; they do not guarantee all generated content is factually correct.
+- The included role knowledge base is curated and is not a live job-market feed. Validate roadmaps against current job descriptions.
+- Treat this as an educational prototype until tests, evaluation cases, and deployment instructions are maintained.
